@@ -170,24 +170,23 @@ class kdn(KernelDensityGraph):
         ndarray
             weights of each input sample in the input data matrix
         """
+        
         M_ref = self._get_activation_pattern(polytope_id)
 
-        M = np.empty((X_.shape[0], 0))
         start = 0
-        for l in range(len(self.network_shape) - 1):
-            if l == 0:
-                W = self.weights[l]
-                B = self.biases[l]
-                M = np.hstack((M, self.unit_step(X_ @ W + B)))
-            else:
-                end = start + self.network_shape[l - 1]
-                M_l = M_ref[start:end]
-                start = end
-                W = W @ np.diag(M_l) @ self.weights[l]
-                B = B @ np.diag(M_l) @ self.weights[l] + self.biases[l]
-                M = np.hstack((M, self.unit_step(X_ @ W + B)))
+        A = X_
+        A_ref = X_
+        for l in range(len(self.network_shape)-1):
+            end = start + self.network_shape[l]
+            M_l = M_ref[start:end]
+            start = end
+            W, B = self.weights[l], self.biases[l]
+            pre_A = A @ W + B
+            A = np.maximum(0, pre_A)
+            pre_A_ref = A_ref @ W + B
+            A_ref = pre_A_ref @ np.diag(M_l) 
 
-        return np.exp(-self.c * np.linalg.norm(M - M_ref, axis=1, ord=1))
+        return np.exp(-self.c*np.linalg.norm(A - A_ref, axis=1, ord=2))
 
     def fit(self, X, y):
         r"""
@@ -221,17 +220,17 @@ class kdn(KernelDensityGraph):
             polytope_member_count = []  # store the polytope member counts
 
             for (
-                polytope_id
-            ) in (
-                polytope_memberships
+                idx
+            ) in range(
+                len(polytope_memberships)
             ):  # fit Gaussians for each unique non-singleton polytopes
 
                 if self.weighting_method == "lin":
                     # compute weights of the input data samples w.r.t reference polytope
-                    weights = self.compute_weights(X_, polytope_id)
+                    weights = self.compute_weights(X_, polytope_memberships[idx])
                 elif self.weighting_method == "fm":
                     ########### FM (will be depricated) ################
-                    a_native = self._get_activation_pattern(polytope_id)
+                    a_native = self._get_activation_pattern(polytope_memberships[idx])
                     weights = []
                     for member_polytope_id in polytope_memberships:
                         a_foreign = self._get_activation_pattern(member_polytope_id)
@@ -250,7 +249,7 @@ class kdn(KernelDensityGraph):
                 ########### FM (will be depricated) ################
                 else:
                     weights = np.zeros((X_.shape[0],))
-                    weights[polytope_memberships == polytope_id] = 1
+                    weights[polytope_memberships == polytope_memberships[idx]] = 1
 
                 weights[weights < 1e-3] = 0  # set very small weights to zero
 
