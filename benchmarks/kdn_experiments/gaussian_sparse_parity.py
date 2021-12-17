@@ -3,7 +3,7 @@
 # Author: Ashwin De Silva (ldesilv2@jhu.edu)
 # Objective: Gaussian Sparse Parity Experiment
 #
-
+# %%
 # import standard libraries
 import numpy as np
 from tensorflow import keras
@@ -19,7 +19,7 @@ from kdg.kdn import *
 p = 20  # total dimensions of the data vector
 p_star = 3  # number of signal dimensions of the data vector
 
-sample_size = [500, 1000, 5000, 10000]  # sample size under consideration
+sample_size = [10, 50, 100, 500, 1000, 5000, 10000]  # sample size under consideration
 n_test = 1000  # test set size
 reps = 5  # number of replicates
 
@@ -76,7 +76,7 @@ for sample in sample_size:
             k=1e-6,
             weighting_method="lin",
             T=2,
-            c=1,
+            c=5,
             verbose=False,
         )
         model_kdn.fit(X, y)
@@ -99,12 +99,13 @@ df.to_csv("results/gsp.csv")
 
 # plot
 
+#%%
 # Specify which results to plot (CHANGE HERE)
 filename = "results/gsp.csv"
 
 df = pd.read_csv(filename)
 
-sample_size = [500, 1000, 5000, 10000]
+sample_size = [10, 50, 100, 500, 1000, 5000, 10000]
 
 err_nn_med = []
 err_nn_25_quantile = []
@@ -151,3 +152,5 @@ ax.legend(frameon=False)
 
 # Specify the figure save path (CHANGE HERE)
 plt.savefig("plots/gsp.pdf")
+
+# %%
