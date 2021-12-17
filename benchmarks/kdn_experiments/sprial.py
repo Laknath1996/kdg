@@ -3,7 +3,7 @@
 # Author: Ashwin De Silva (ldesilv2@jhu.edu)
 # Objective: Spiral Experiment
 #
-
+#%%
 # import standard libraries
 import numpy as np
 from tensorflow import keras
@@ -68,7 +68,7 @@ model_kdn = kdn(
     polytope_compute_method="all",
     weighting_method="lin",
     T=2,
-    c=1,
+    c=5,
     verbose=False,
 )
 model_kdn.fit(X, y)
@@ -128,3 +128,5 @@ fig.colorbar(ax2, ax=ax[2], fraction=0.046, pad=0.04)
 
 fig.savefig("plots/spiral.pdf")
 plt.show()
+
+# %%
