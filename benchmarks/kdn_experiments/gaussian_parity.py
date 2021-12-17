@@ -4,6 +4,7 @@
 # Objective: Gaussian Parity Experiment
 #
 
+# %%
 # import standard libraries
 import numpy as np
 from tensorflow import keras
@@ -15,7 +16,7 @@ from kdg.kdn import *
 from kdg.utils import generate_gaussian_parity
 
 # generate training data
-X, y = generate_gaussian_parity(10000)
+X, y = generate_gaussian_parity(5000)
 X_val, y_val = generate_gaussian_parity(500)
 
 # NN params
@@ -66,7 +67,7 @@ model_kdn = kdn(
     polytope_compute_method="all",
     weighting_method="lin",
     T=2,
-    c=1,
+    c=5,
     verbose=False,
 )
 model_kdn.fit(X, y)
@@ -127,3 +128,5 @@ fig.colorbar(ax2, ax=ax[2], fraction=0.046, pad=0.04)
 fig.savefig("plots/gaussian_parity.pdf")
 plt.show()
 
+
+# %%
