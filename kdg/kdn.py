@@ -176,6 +176,7 @@ class kdn(KernelDensityGraph):
         start = 0
         A = X_
         A_ref = X_
+        d = 0
         for l in range(len(self.network_shape)-1):
             end = start + self.network_shape[l]
             M_l = M_ref[start:end]
@@ -185,8 +186,9 @@ class kdn(KernelDensityGraph):
             A = np.maximum(0, pre_A)
             pre_A_ref = A_ref @ W + B
             A_ref = pre_A_ref @ np.diag(M_l) 
+            d += np.linalg.norm(A - A_ref, axis=1, ord=2)
 
-        return np.exp(-self.c*np.linalg.norm(A - A_ref, axis=1, ord=2))
+        return np.exp(-self.c * d)
 
     def fit(self, X, y):
         r"""
