@@ -11,15 +11,27 @@ from tensorflow import keras
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import argparse
 
 # importing internal libraries
 from kdg.utils import generate_gaussian_parity
 from kdg.kdn import *
 
+# get user inputs
+parser = argparse.ArgumentParser()
+parser.add_argument('-c')
+parser.add_argument('-k')
+parser.add_argument('-reps')
+args = vars(parser.parse_args())
+c = float(args['c'])
+k = float(args['k'])
+r = int(args['reps'])
+print("Running the Gaussian Parity 'samples size vs error' experiment...")
+
 # define the experimental setup
 sample_size = [10, 50, 100, 500, 1000, 5000, 10000]  # sample size under consideration
 n_test = 1000  # test set size
-reps = 5  # number of replicates
+reps = r # number of replicates
 
 df = pd.DataFrame()
 reps_list = []
@@ -70,10 +82,10 @@ for sample in sample_size:
         model_kdn = kdn(
             network=vanilla_nn,
             polytope_compute_method="all",
-            k=1e-6,
+            k=k,
             weighting_method="lin",
             T=2,
-            c=5,
+            c=c,
             verbose=False,
         )
         model_kdn.fit(X, y)
@@ -149,5 +161,4 @@ ax.legend(frameon=False)
 
 # Specify the figure save path (CHANGE HERE)
 plt.savefig("plots/gaussian_parity_exp.pdf")
-
-# %%
+print("Complete!")

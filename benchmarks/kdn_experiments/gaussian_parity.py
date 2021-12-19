@@ -15,6 +15,11 @@ import matplotlib.pyplot as plt
 from kdg.kdn import *
 from kdg.utils import generate_gaussian_parity
 
+# get user inputs
+c = 2
+k = 1e-5
+print("Running the Gaussian Parity experiment...")
+
 # generate training data
 X, y = generate_gaussian_parity(5000)
 X_val, y_val = generate_gaussian_parity(500)
@@ -42,7 +47,6 @@ def getNN():
     network_base.compile(**compile_kwargs)
     return network_base
 
-
 # train Vanilla NN
 vanilla_nn = getNN()
 history = vanilla_nn.fit(X, keras.utils.to_categorical(y), **fit_kwargs)
@@ -63,11 +67,11 @@ print("Vanilla NN accuracy : ", accuracy_nn)
 # train KDN
 model_kdn = kdn(
     network=vanilla_nn,
-    k=1e-6,
+    k=k,
     polytope_compute_method="all",
     weighting_method="lin",
     T=2,
-    c=5,
+    c=c,
     verbose=False,
 )
 model_kdn.fit(X, y)
@@ -127,6 +131,8 @@ fig.colorbar(ax2, ax=ax[2], fraction=0.046, pad=0.04)
 
 fig.savefig("plots/gaussian_parity.pdf")
 plt.show()
+
+print("Completed!")
 
 
 # %%

@@ -1,7 +1,7 @@
 #
 # Created on Thu Dec 09 2021 6:44:55 AM
 # Author: Ashwin De Silva (ldesilv2@jhu.edu)
-# Objective: Gaussian Parity Experiment
+# Objective: Ellipse Sample Size vs Error Experiment
 #
 # %%
 
@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import argparse
 
 # importing internal libraries
-from kdg.utils import generate_spirals
+from kdg.utils import generate_ellipse
 from kdg.kdn import *
 
 # get user inputs
@@ -26,7 +26,7 @@ args = vars(parser.parse_args())
 c = float(args['c'])
 k = float(args['k'])
 r = int(args['reps'])
-print("Running the Spiral 'samples size vs error' experiment...")
+print("Running the Gaussian Parity 'samples size vs error' experiment...")
 
 # define the experimental setup
 sample_size = [10, 50, 100, 500, 1000, 5000, 10000]  # sample size under consideration
@@ -41,7 +41,7 @@ accuracy_nn = []
 accuracy_nn_ = []
 sample_list = []
 
-X_val, y_val = generate_spirals(1000, noise=0.8, n_class=2)
+X_val, y_val = generate_ellipse(1000)
 
 # NN params
 compile_kwargs = {
@@ -73,8 +73,8 @@ def getNN():
 for sample in sample_size:
     print("Doing sample %d" % sample)
     for ii in range(reps):
-        X, y = generate_spirals(sample, noise=0.8, n_class=2)
-        X_test, y_test = generate_spirals(n_test, noise=0.8, n_class=2)
+        X, y = generate_ellipse(sample)
+        X_test, y_test = generate_ellipse(n_test)
 
         # train Vanilla NN
         vanilla_nn = getNN()
@@ -106,13 +106,13 @@ df["reps"] = reps_list
 df["sample"] = sample_list
 
 # save the results (CHANGE HERE)
-df.to_csv("results/spiral.csv")
+df.to_csv("results/ellipse.csv")
 
 # plot
 
 #%%
 # Specify which results to plot (CHANGE HERE)
-filename = "results/spiral.csv"
+filename = "results/ellipse.csv"
 
 df = pd.read_csv(filename)
 
@@ -162,5 +162,5 @@ ax.set_ylabel("error")
 ax.legend(frameon=False)
 
 # Specify the figure save path (CHANGE HERE)
-plt.savefig("plots/spiral_exp.pdf")
-print("Complete!")
+plt.savefig("plots/ellipse_exp.pdf")
+print("Completed!")

@@ -1,10 +1,9 @@
 #
 # Created on Thu Dec 09 2021 6:44:55 AM
 # Author: Ashwin De Silva (ldesilv2@jhu.edu)
-# Objective: Gaussian Parity Experiment
+# Objective: Gaussian Sparse Parity Experiment
 #
 # %%
-
 # import standard libraries
 import numpy as np
 from tensorflow import keras
@@ -14,7 +13,7 @@ import matplotlib.pyplot as plt
 import argparse
 
 # importing internal libraries
-from kdg.utils import generate_spirals
+from kdg.utils import gaussian_sparse_parity
 from kdg.kdn import *
 
 # get user inputs
@@ -26,9 +25,12 @@ args = vars(parser.parse_args())
 c = float(args['c'])
 k = float(args['k'])
 r = int(args['reps'])
-print("Running the Spiral 'samples size vs error' experiment...")
+print("Running the Gaussian Sparse Parity 'samples size vs error' experiment...")
 
 # define the experimental setup
+p = 20  # total dimensions of the data vector
+p_star = 3  # number of signal dimensions of the data vector
+
 sample_size = [10, 50, 100, 500, 1000, 5000, 10000]  # sample size under consideration
 n_test = 1000  # test set size
 reps = r  # number of replicates
@@ -41,16 +43,16 @@ accuracy_nn = []
 accuracy_nn_ = []
 sample_list = []
 
-X_val, y_val = generate_spirals(1000, noise=0.8, n_class=2)
+X_val, y_val = gaussian_sparse_parity(1000)
 
 # NN params
 compile_kwargs = {
     "loss": "binary_crossentropy",
-    "optimizer": keras.optimizers.Adam(3e-4),
+    "optimizer": keras.optimizers.Adam(1e-3),
 }
 callback = keras.callbacks.EarlyStopping(monitor="val_loss", patience=10, verbose=False)
 fit_kwargs = {
-    "epochs": 300,
+    "epochs": 200,
     "batch_size": 32,
     "verbose": False,
     "validation_data": (X_val, keras.utils.to_categorical(y_val)),
@@ -61,20 +63,19 @@ fit_kwargs = {
 def getNN():
     initializer = keras.initializers.GlorotNormal(seed=0)
     network_base = keras.Sequential()
-    network_base.add(keras.layers.Dense(10, activation="relu", kernel_initializer=initializer, input_shape=(2,)))
-    network_base.add(keras.layers.Dense(10, activation="relu", kernel_initializer=initializer))
-    network_base.add(keras.layers.Dense(10, activation="relu", kernel_initializer=initializer))
+    network_base.add(keras.layers.Dense(5, activation="relu", kernel_initializer=initializer, input_shape=(20,)))
     network_base.add(keras.layers.Dense(5, activation="relu", kernel_initializer=initializer))
-    network_base.add(keras.layers.Dense(units=2, activation="softmax", kernel_initializer=initializer ))
+    network_base.add(keras.layers.Dense(units=2, activation="softmax", kernel_initializer=initializer))
     network_base.compile(**compile_kwargs)
     return network_base
+
 
 # run experiment
 for sample in sample_size:
     print("Doing sample %d" % sample)
     for ii in range(reps):
-        X, y = generate_spirals(sample, noise=0.8, n_class=2)
-        X_test, y_test = generate_spirals(n_test, noise=0.8, n_class=2)
+        X, y = gaussian_sparse_parity(sample, p_star=p_star, p=p)
+        X_test, y_test = gaussian_sparse_parity(n_test, p_star=p_star, p=p)
 
         # train Vanilla NN
         vanilla_nn = getNN()
@@ -106,13 +107,13 @@ df["reps"] = reps_list
 df["sample"] = sample_list
 
 # save the results (CHANGE HERE)
-df.to_csv("results/spiral.csv")
+df.to_csv("results/gsp.csv")
 
 # plot
 
 #%%
 # Specify which results to plot (CHANGE HERE)
-filename = "results/spiral.csv"
+filename = "results/gsp.csv"
 
 df = pd.read_csv(filename)
 
@@ -162,5 +163,5 @@ ax.set_ylabel("error")
 ax.legend(frameon=False)
 
 # Specify the figure save path (CHANGE HERE)
-plt.savefig("plots/spiral_exp.pdf")
-print("Complete!")
+plt.savefig("plots/gsp.pdf")
+print("Completed!")

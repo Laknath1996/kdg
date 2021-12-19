@@ -1,7 +1,7 @@
 #
 # Created on Thu Dec 09 2021 6:04:08 AM
 # Author: Ashwin De Silva (ldesilv2@jhu.edu)
-# Objective: Spiral Experiment
+# Objective: Ellipse Experiment
 #
 #%%
 # import standard libraries
@@ -12,16 +12,11 @@ import matplotlib.pyplot as plt
 
 # import internal libraries
 from kdg.kdn import *
-from kdg.utils import generate_spirals
-
-# get user inputs
-c = 2
-k = 1e-5
-print("Running the Gaussian Parity experiment...")
+from kdg.utils import generate_ellipse
 
 # generate training data
-X, y = generate_spirals(10000, noise=0.8, n_class=2)
-X_val, y_val = generate_spirals(500, noise=0.8, n_class=2)
+X, y = generate_ellipse(10000)
+X_val, y_val = generate_ellipse(500)
 
 # NN params
 compile_kwargs = {
@@ -62,20 +57,19 @@ ax.set_ylabel("loss")
 ax.legend(["train", "val"])
 
 # print the accuracy of Vanilla NN and KDN
-X_test, y_test = generate_spirals(1000, noise=0.8, n_class=2)
+X_test, y_test = generate_ellipse(1000)
 accuracy_nn = np.mean(np.argmax(vanilla_nn.predict(X_test), axis=1) == y_test)
 print("Vanilla NN accuracy : ", accuracy_nn)
 
 # %%
-
 # train KDN
 model_kdn = kdn(
     network=vanilla_nn,
-    k=k,
+    k=1e-5,
     polytope_compute_method="all",
     weighting_method="lin",
     T=2,
-    c=c,
+    c=1,
     verbose=False,
 )
 model_kdn.fit(X, y)
@@ -85,6 +79,8 @@ accuracy_kdn = np.mean(model_kdn.predict(X_test) == y_test)
 print("KDN accuracy : ", accuracy_kdn)
 
 # plot
+
+# %%
 
 # define the grid
 p = np.arange(-2, 2, step=0.005)
@@ -133,8 +129,7 @@ ax[2].set_title("KDN", fontsize=24)
 ax[2].set_aspect("equal")
 fig.colorbar(ax2, ax=ax[2], fraction=0.046, pad=0.04)
 
-fig.savefig("plots/spiral.pdf")
+fig.savefig("plots/ellipse.pdf")
 plt.show()
-print("Completed!")
 
 # %%
