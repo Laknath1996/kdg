@@ -31,7 +31,7 @@ print("Running the Gaussian Sparse Parity 'samples size vs error' experiment..."
 p = 20  # total dimensions of the data vector
 p_star = 3  # number of signal dimensions of the data vector
 
-sample_size = [10, 50, 100, 500, 1000, 5000, 10000]  # sample size under consideration
+sample_size = [5, 10, 50, 100, 500, 1000, 5000, 10000]  # sample size under consideration
 n_test = 1000  # test set size
 reps = r  # number of replicates
 
@@ -43,7 +43,7 @@ accuracy_nn = []
 accuracy_nn_ = []
 sample_list = []
 
-X_val, y_val = gaussian_sparse_parity(1000)
+X_val, y_val = gaussian_sparse_parity(1000, p_star=p_star, p=p)
 
 # NN params
 compile_kwargs = {
@@ -117,7 +117,7 @@ filename = "results/gsp.csv"
 
 df = pd.read_csv(filename)
 
-sample_size = [10, 50, 100, 500, 1000, 5000, 10000]
+sample_size = [5, 10, 50, 100, 500, 1000, 5000, 10000]
 
 err_nn_med = []
 err_nn_25_quantile = []

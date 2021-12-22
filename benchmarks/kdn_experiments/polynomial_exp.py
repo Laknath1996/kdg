@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import argparse
 
 # importing internal libraries
-from kdg.utils import generate_spirals
+from kdg.utils import generate_polynomial
 from kdg.kdn import *
 
 # get user inputs
@@ -26,10 +26,10 @@ args = vars(parser.parse_args())
 c = float(args['c'])
 k = float(args['k'])
 r = int(args['reps'])
-print("Running the Spiral 'samples size vs error' experiment...")
+print("Running the Polynomial 'samples size vs error' experiment...")
 
 # define the experimental setup
-sample_size = [10, 50, 100, 500, 1000, 5000, 10000]  # sample size under consideration
+sample_size = [5, 10, 50, 100, 500, 1000, 5000, 10000]  # sample size under consideration
 n_test = 1000  # test set size
 reps = r  # number of replicates
 
@@ -41,7 +41,7 @@ accuracy_nn = []
 accuracy_nn_ = []
 sample_list = []
 
-X_val, y_val = generate_spirals(1000, noise=0.8, n_class=2)
+X_val, y_val = generate_polynomial(1000, a=(1, 3))
 
 # NN params
 compile_kwargs = {
@@ -61,9 +61,9 @@ fit_kwargs = {
 def getNN():
     initializer = keras.initializers.GlorotNormal(seed=0)
     network_base = keras.Sequential()
-    network_base.add(keras.layers.Dense(5, activation="relu", kernel_initializer=initializer, input_shape=(2,)))
-    network_base.add(keras.layers.Dense(5, activation="relu", kernel_initializer=initializer))
-    network_base.add(keras.layers.Dense(5, activation="relu", kernel_initializer=initializer))
+    network_base.add(keras.layers.Dense(6, activation="relu", kernel_initializer=initializer, input_shape=(2,)))
+    network_base.add(keras.layers.Dense(6, activation="relu", kernel_initializer=initializer))
+    network_base.add(keras.layers.Dense(6, activation="relu", kernel_initializer=initializer))
     network_base.add(keras.layers.Dense(units=2, activation="softmax", kernel_initializer=initializer ))
     network_base.compile(**compile_kwargs)
     return network_base
@@ -72,8 +72,8 @@ def getNN():
 for sample in sample_size:
     print("Doing sample %d" % sample)
     for ii in range(reps):
-        X, y = generate_spirals(sample, noise=0.8, n_class=2)
-        X_test, y_test = generate_spirals(n_test, noise=0.8, n_class=2)
+        X, y = generate_polynomial(sample, a=(1, 3))
+        X_test, y_test = generate_polynomial(n_test, a=(1, 3))
 
         # train Vanilla NN
         vanilla_nn = getNN()
@@ -115,7 +115,7 @@ filename = "results/polynomial.csv"
 
 df = pd.read_csv(filename)
 
-sample_size = [10, 50, 100, 500, 1000, 5000, 10000]
+sample_size = [5, 10, 50, 100, 500, 1000, 5000, 10000]
 
 err_nn_med = []
 err_nn_25_quantile = []

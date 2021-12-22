@@ -29,7 +29,7 @@ r = int(args['reps'])
 print("Running the Gaussian Parity 'samples size vs error' experiment...")
 
 # define the experimental setup
-sample_size = [10, 50, 100, 500, 1000, 5000, 10000]  # sample size under consideration
+sample_size = [5, 10, 50, 100, 500, 1000, 5000, 10000]  # sample size under consideration
 n_test = 1000  # test set size
 reps = r  # number of replicates
 
@@ -116,7 +116,7 @@ filename = "results/ellipse.csv"
 
 df = pd.read_csv(filename)
 
-sample_size = [10, 50, 100, 500, 1000, 5000, 10000]
+sample_size = [5, 10, 50, 100, 500, 1000, 5000, 10000]
 
 err_nn_med = []
 err_nn_25_quantile = []

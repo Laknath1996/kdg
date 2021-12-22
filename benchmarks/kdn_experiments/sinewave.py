@@ -35,11 +35,11 @@ fit_kwargs = {
 # network architecture
 def getNN():
     network_base = keras.Sequential()
-    network_base.add(keras.layers.Dense(10, activation="relu", input_shape=(2,)))
-    network_base.add(keras.layers.Dense(10, activation="relu"))
-    network_base.add(keras.layers.Dense(10, activation="relu"))
-    network_base.add(keras.layers.Dense(10, activation="relu"))
-    network_base.add(keras.layers.Dense(10, activation="relu"))
+    network_base.add(keras.layers.Dense(12, activation="relu", input_shape=(2,)))
+    network_base.add(keras.layers.Dense(12, activation="relu"))
+    network_base.add(keras.layers.Dense(12, activation="relu"))
+    network_base.add(keras.layers.Dense(12, activation="relu"))
+    # network_base.add(keras.layers.Dense(10, activation="relu"))
     network_base.add(keras.layers.Dense(units=2, activation="softmax"))
     network_base.compile(**compile_kwargs)
     return network_base
@@ -61,6 +61,7 @@ X_test, y_test = generate_sinewave(1000, sigma=0.25)
 accuracy_nn = np.mean(np.argmax(vanilla_nn.predict(X_test), axis=1) == y_test)
 print("Vanilla NN accuracy : ", accuracy_nn)
 
+# %%
 # train KDN
 model_kdn = kdn(
     network=vanilla_nn,
@@ -68,7 +69,7 @@ model_kdn = kdn(
     polytope_compute_method="all",
     weighting_method="lin",
     T=2,
-    c=1,
+    c=2,
     verbose=False,
 )
 model_kdn.fit(X, y)
@@ -81,8 +82,8 @@ print("KDN accuracy : ", accuracy_kdn)
 # plot
 
 # define the grid
-p = np.arange(-2, 14, step=0.05)
-q = np.arange(-2, 2, step=0.05)
+p = np.arange(-2, 14, step=0.005)
+q = np.arange(-2, 2, step=0.005)
 xx, yy = np.meshgrid(p, q)
 tmp = np.ones(xx.shape)
 grid_samples = np.concatenate((xx.reshape(-1, 1), yy.reshape(-1, 1)), axis=1)
@@ -103,7 +104,7 @@ ax[0].set_title("Data", fontsize=24)
 ax[0].set_aspect("equal")
 
 ax1 = ax[1].imshow(
-    proba_nn[:, 0].reshape(80, 320),
+    np.flip(proba_nn[:, 0].reshape(800, 3200), axis=0),
     extent=[xx.min(), xx.max(), yy.min(), yy.max()],
     cmap="bwr",
     vmin=0,
@@ -116,7 +117,7 @@ ax[1].set_aspect("equal")
 fig.colorbar(ax1, ax=ax[1], fraction=0.046, pad=0.04)
 
 ax2 = ax[2].imshow(
-    proba_kdn[:, 0].reshape(80, 320),
+    np.flip(proba_kdn[:, 0].reshape(800, 3200), axis=0),
     extent=[xx.min(), xx.max(), yy.min(), yy.max()],
     cmap="bwr",
     vmin=0,

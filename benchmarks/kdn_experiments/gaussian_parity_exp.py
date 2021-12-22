@@ -46,11 +46,11 @@ X_val, y_val = generate_gaussian_parity(1000)
 # NN params
 compile_kwargs = {
     "loss": "binary_crossentropy",
-    "optimizer": keras.optimizers.Adam(1e-3),
+    "optimizer": keras.optimizers.Adam(3e-4),
 }
 callback = keras.callbacks.EarlyStopping(monitor="val_loss", patience=10, verbose=False)
 fit_kwargs = {
-    "epochs": 200,
+    "epochs": 300,
     "batch_size": 32,
     "verbose": False,
     "validation_data": (X_val, keras.utils.to_categorical(y_val)),

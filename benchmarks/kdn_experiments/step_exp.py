@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import argparse
 
 # importing internal libraries
-from kdg.utils import generate_spirals
+from kdg.utils import generate_steps
 from kdg.kdn import *
 
 # get user inputs
@@ -29,7 +29,7 @@ r = int(args['reps'])
 print("Running the Step 'samples size vs error' experiment...")
 
 # define the experimental setup
-sample_size = [10, 50, 100, 500, 1000, 5000, 10000]  # sample size under consideration
+sample_size = [5, 10, 50, 100, 500, 1000, 5000, 10000]  # sample size under consideration
 n_test = 1000  # test set size
 reps = r  # number of replicates
 
@@ -41,7 +41,7 @@ accuracy_nn = []
 accuracy_nn_ = []
 sample_list = []
 
-X_val, y_val = generate_spirals(1000, noise=0.8, n_class=2)
+X_val, y_val = generate_steps(1000)
 
 # NN params
 compile_kwargs = {
@@ -73,8 +73,8 @@ def getNN():
 for sample in sample_size:
     print("Doing sample %d" % sample)
     for ii in range(reps):
-        X, y = generate_spirals(sample, noise=0.8, n_class=2)
-        X_test, y_test = generate_spirals(n_test, noise=0.8, n_class=2)
+        X, y = generate_steps(sample)
+        X_test, y_test = generate_steps(n_test)
 
         # train Vanilla NN
         vanilla_nn = getNN()
@@ -116,7 +116,7 @@ filename = "results/step.csv"
 
 df = pd.read_csv(filename)
 
-sample_size = [10, 50, 100, 500, 1000, 5000, 10000]
+sample_size = [5, 10, 50, 100, 500, 1000, 5000, 10000]
 
 err_nn_med = []
 err_nn_25_quantile = []
