@@ -192,7 +192,7 @@ class kdn(KernelDensityGraph):
 
     def fit(self, X, y):
         r"""
-        Fits the kernel density forest.
+        Fits the kernel density network
         Parameters
         ----------
         X : ndarray
