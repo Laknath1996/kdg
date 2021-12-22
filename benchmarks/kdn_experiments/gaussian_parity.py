@@ -16,22 +16,22 @@ from kdg.kdn import *
 from kdg.utils import generate_gaussian_parity
 
 # get user inputs
-c = 2
+c = 10
 k = 1e-5
 print("Running the Gaussian Parity experiment...")
 
 # generate training data
-X, y = generate_gaussian_parity(5000)
+X, y = generate_gaussian_parity(10)
 X_val, y_val = generate_gaussian_parity(500)
 
 # NN params
 compile_kwargs = {
     "loss": "binary_crossentropy",
-    "optimizer": keras.optimizers.Adam(1e-3),
+    "optimizer": keras.optimizers.Adam(3e-4),
 }
 callback = keras.callbacks.EarlyStopping(monitor="val_loss", patience=10, verbose=True)
 fit_kwargs = {
-    "epochs": 200,
+    "epochs": 300,
     "batch_size": 32,
     "verbose": True,
     "validation_data": (X_val, keras.utils.to_categorical(y_val)),
@@ -64,6 +64,7 @@ X_test, y_test = generate_gaussian_parity(1000)
 accuracy_nn = np.mean(np.argmax(vanilla_nn.predict(X_test), axis=1) == y_test)
 print("Vanilla NN accuracy : ", accuracy_nn)
 
+# %%
 # train KDN
 model_kdn = kdn(
     network=vanilla_nn,
@@ -80,11 +81,12 @@ model_kdn.fit(X, y)
 accuracy_kdn = np.mean(model_kdn.predict(X_test) == y_test)
 print("KDN accuracy : ", accuracy_kdn)
 
+# %%
 # plot
 
 # define the grid
-p = np.arange(-2, 2, step=0.005)
-q = np.arange(-2, 2, step=0.005)
+p = np.arange(-2, 2, step=0.05)
+q = np.arange(-2, 2, step=0.05)
 xx, yy = np.meshgrid(p, q)
 tmp = np.ones(xx.shape)
 grid_samples = np.concatenate((xx.reshape(-1, 1), yy.reshape(-1, 1)), axis=1)
@@ -104,7 +106,7 @@ ax[0].set_title("Data", fontsize=24)
 ax[0].set_aspect("equal")
 
 ax1 = ax[1].imshow(
-    proba_nn[:, 0].reshape(800, 800).T,
+    proba_nn[:, 0].reshape(80, 80).T,
     extent=[xx.min(), xx.max(), yy.min(), yy.max()],
     cmap="bwr",
     vmin=0,
@@ -117,7 +119,7 @@ ax[1].set_aspect("equal")
 fig.colorbar(ax1, ax=ax[1], fraction=0.046, pad=0.04)
 
 ax2 = ax[2].imshow(
-    proba_kdn[:, 0].reshape(800, 800).T,
+    proba_kdn[:, 0].reshape(80, 80).T,
     extent=[xx.min(), xx.max(), yy.min(), yy.max()],
     cmap="bwr",
     vmin=0,
@@ -129,7 +131,7 @@ ax[2].set_title("KDN", fontsize=24)
 ax[2].set_aspect("equal")
 fig.colorbar(ax2, ax=ax[2], fraction=0.046, pad=0.04)
 
-fig.savefig("plots/gaussian_parity.pdf")
+# fig.savefig("plots/gaussian_parity.pdf")
 plt.show()
 
 print("Completed!")
