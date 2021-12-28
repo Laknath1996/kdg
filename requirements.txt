@@ -1,8 +1,7 @@
 absl-py==0.14.0
 appnope==0.1.2
 astunparse==1.6.3
-backcall==0.2.0
-black==21.12b0
+backcall==0.2.00
 cached-property==1.5.2
 cachetools==4.2.2
 certifi==2021.5.30
