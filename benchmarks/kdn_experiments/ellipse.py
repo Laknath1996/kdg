@@ -9,6 +9,7 @@ import numpy as np
 from tensorflow import keras
 import seaborn as sns
 import matplotlib.pyplot as plt
+import pandas as pd
 
 # import internal libraries
 from kdg.kdn import *
@@ -93,7 +94,16 @@ grid_samples = np.concatenate((xx.reshape(-1, 1), yy.reshape(-1, 1)), axis=1)
 proba_kdn = model_kdn.predict_proba(grid_samples)
 proba_nn = model_kdn.predict_proba_nn(grid_samples)
 
-fig, ax = plt.subplots(1, 3, figsize=(40, 40))
+# %%
+
+filename = "results/ellipse.csv"
+data = np.load( "results/ellipse_data.npz")
+X = data['X']
+y = data['y']
+proba_nn = data['proba_nn']
+proba_kdn = data['proba_kdn']
+
+fig, ax = plt.subplots(1, 4, figsize=(40, 10))
 
 colors = sns.color_palette("Dark2", n_colors=2)
 clr = [colors[i] for i in y]
@@ -102,6 +112,7 @@ ax[0].set_xlim(-2, 2)
 ax[0].set_ylim(-2, 2)
 ax[0].set_title("Data", fontsize=24)
 ax[0].set_aspect("equal")
+ax[0].tick_params(axis='both', labelsize=20)
 
 ax1 = ax[1].imshow(
     proba_nn[:, 0].reshape(800, 800).T,
@@ -109,12 +120,14 @@ ax1 = ax[1].imshow(
     cmap="bwr",
     vmin=0,
     vmax=1,
-    interpolation="nearest",
-    aspect="auto",
+    interpolation="nearest"
+    # aspect="auto",
 )
 ax[1].set_title("NN", fontsize=24)
-ax[1].set_aspect("equal")
-fig.colorbar(ax1, ax=ax[1], fraction=0.046, pad=0.04)
+# ax[1].set_aspect("equal")
+cbar = fig.colorbar(ax1, ax=ax[1], fraction=0.046, pad=0.04)
+cbar.ax.tick_params(labelsize=20) 
+ax[1].tick_params(axis='both', labelsize=15)
 
 ax2 = ax[2].imshow(
     proba_kdn[:, 0].reshape(800, 800).T,
@@ -122,14 +135,73 @@ ax2 = ax[2].imshow(
     cmap="bwr",
     vmin=0,
     vmax=1,
-    interpolation="nearest",
-    aspect="auto",
+    interpolation="nearest"
+    # aspect="auto",
 )
 ax[2].set_title("KDN", fontsize=24)
-ax[2].set_aspect("equal")
-fig.colorbar(ax2, ax=ax[2], fraction=0.046, pad=0.04)
+# ax[2].set_aspect("equal")
+cbar = fig.colorbar(ax2, ax=ax[2], fraction=0.046, pad=0.04)
+cbar.ax.tick_params(labelsize=20) 
+ax[2].tick_params(axis='both', labelsize=15)
 
-fig.savefig("plots/ellipse.pdf")
+df = pd.read_csv(filename)
+
+sample_size = [5, 10, 50, 100, 500, 1000, 5000, 10000]
+
+err_nn_med = []
+err_nn_25_quantile = []
+err_nn_75_quantile = []
+
+err_kdn_med = []
+err_kdn_25_quantile = []
+err_kdn_75_quantile = []
+
+for sample in sample_size:
+    err_nn = 1 - df["accuracy nn"][df["sample"] == sample]
+    err_kdn = 1 - df["accuracy kdn"][df["sample"] == sample]
+
+    err_nn_med.append(np.median(err_nn))
+    err_nn_25_quantile.append(np.quantile(err_nn, [0.25])[0])
+    err_nn_75_quantile.append(np.quantile(err_nn, [0.75])[0])
+
+    err_kdn_med.append(np.median(err_kdn))
+    err_kdn_25_quantile.append(np.quantile(err_kdn, [0.25])[0])
+    err_kdn_75_quantile.append(np.quantile(err_kdn, [0.75])[0])
+
+ax[3].plot(sample_size, err_nn_med, c="k", label="NN")
+ax[3].fill_between(
+    sample_size, err_nn_25_quantile, err_nn_75_quantile, facecolor="k", alpha=0.3
+)
+
+ax[3].plot(sample_size, err_kdn_med, c="r", label="KDN")
+ax[3].fill_between(
+    sample_size, err_kdn_25_quantile, err_kdn_75_quantile, facecolor="r", alpha=0.3
+)
+
+right_side = ax[3].spines["right"]
+right_side.set_visible(False)
+top_side = ax[3].spines["top"]
+top_side.set_visible(False)
+
+ax[3].set_xscale("log")
+ax[3].set_xlabel("Sample Size", fontsize=24)
+ax[3].set_ylabel("Error", fontsize=24)
+ax[3].legend(frameon=False, fontsize=20)
+ax[3].tick_params(axis='both', labelsize=20)
+asp = np.diff(ax[1].get_xlim())[0] / np.diff(ax[1].get_ylim())[0]
+ax[0].set_aspect(asp)
+# ax[3].set_aspect("equal")
+
+# fig.savefig("plots/ellipse.pdf")
 plt.show()
 
 # %%
+
+# save the figure data
+np.savez(
+    "results/ellipse_data.npz",
+    X=X, 
+    y=y,
+    proba_nn=proba_nn, 
+    proba_kdn=proba_kdn
+)
