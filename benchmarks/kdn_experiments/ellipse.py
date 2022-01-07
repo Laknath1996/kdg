@@ -15,6 +15,8 @@ import pandas as pd
 from kdg.kdn import *
 from kdg.utils import generate_ellipse
 
+# %%
+
 # generate training data
 X, y = generate_ellipse(10000)
 X_val, y_val = generate_ellipse(500)
@@ -91,8 +93,8 @@ tmp = np.ones(xx.shape)
 grid_samples = np.concatenate((xx.reshape(-1, 1), yy.reshape(-1, 1)), axis=1)
 
 # plot
-proba_kdn = model_kdn.predict_proba(grid_samples)
-proba_nn = model_kdn.predict_proba_nn(grid_samples)
+# proba_kdn = model_kdn.predict_proba(grid_samples)
+# proba_nn = model_kdn.predict_proba_nn(grid_samples)
 
 # %%
 
@@ -102,12 +104,15 @@ X = data['X']
 y = data['y']
 proba_nn = data['proba_nn']
 proba_kdn = data['proba_kdn']
+X, y = generate_ellipse(100000)
 
 fig, ax = plt.subplots(1, 4, figsize=(40, 10))
 
-colors = sns.color_palette("Dark2", n_colors=2)
-clr = [colors[i] for i in y]
-ax[0].scatter(X[:, 0], X[:, 1], c=clr, s=20)
+import matplotlib
+cmap = matplotlib.cm.get_cmap('bwr')
+# colors = sns.color_palette("bwr", n_colors=2)
+clr = [cmap(255 - 255*i) for i in y]
+ax[0].scatter(X[:, 0], X[:, 1], c=clr, s=1, alpha=0.5)
 ax[0].set_xlim(-2, 2)
 ax[0].set_ylim(-2, 2)
 ax[0].set_title("Data", fontsize=24)
@@ -191,9 +196,10 @@ ax[3].tick_params(axis='both', labelsize=20)
 asp = np.diff(ax[1].get_xlim())[0] / np.diff(ax[1].get_ylim())[0]
 ax[0].set_aspect(asp)
 # ax[3].set_aspect("equal")
-
-# fig.savefig("plots/ellipse.pdf")
 plt.show()
+
+# %%
+fig.savefig("plots/ellipse.pdf")
 
 # %%
 

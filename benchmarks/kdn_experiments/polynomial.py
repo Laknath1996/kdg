@@ -14,6 +14,7 @@ import pandas as pd
 # import internal libraries
 from kdg.kdn import *
 from kdg.utils import generate_polynomial
+# %%
 
 # generate training data
 X, y = generate_polynomial(10000, a=(1, 3))
@@ -90,22 +91,25 @@ tmp = np.ones(xx.shape)
 grid_samples = np.concatenate((xx.reshape(-1, 1), yy.reshape(-1, 1)), axis=1)
 
 # plot
-proba_kdn = model_kdn.predict_proba(grid_samples)
-proba_nn = model_kdn.predict_proba_nn(grid_samples)
+# proba_kdn = model_kdn.predict_proba(grid_samples)
+# proba_nn = model_kdn.predict_proba_nn(grid_samples)
 
 # %%
 filename = "results/polynomial.csv"
-# data = np.load( "results/polynomial_data.npz")
-# X = data['X']
-# y = data['y']
-# proba_nn = data['proba_nn']
-# proba_kdn = data['proba_kdn']
+data = np.load( "results/polynomial.npz")
+X = data['X']
+y = data['y']
+proba_nn = data['proba_nn']
+proba_kdn = data['proba_kdn']
+X, y = generate_polynomial(100000, a=(1, 3))
 
 fig, ax = plt.subplots(1, 4, figsize=(40, 10))
 
-colors = sns.color_palette("Dark2", n_colors=2)
-clr = [colors[i] for i in y]
-ax[0].scatter(X[:, 0], X[:, 1], c=clr, s=20)
+import matplotlib
+cmap = matplotlib.cm.get_cmap('bwr')
+# colors = sns.color_palette("bwr", n_colors=2)
+clr = [cmap(255 - 255*i) for i in y]
+ax[0].scatter(X[:, 0], X[:, 1], c=clr, s=1, alpha=0.5)
 ax[0].set_xlim(-1.5, 1.5)
 ax[0].set_ylim(-1.5, 1.5)
 ax[0].set_title("Data", fontsize=24)
