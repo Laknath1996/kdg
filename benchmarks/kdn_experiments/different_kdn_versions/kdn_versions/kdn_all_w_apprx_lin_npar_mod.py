@@ -186,7 +186,7 @@ class kdn():
             pre_A_ref = A_ref @ W + B
             A_ref = pre_A_ref @ np.diag(M_l) 
             d += np.linalg.norm(A - A_ref, axis=1, ord=2)
-
+        # d = np.linalg.norm(A - A_ref, axis=1, ord=2)
         return np.exp(-self.c * d)
 
     def fit(self, X, y):
