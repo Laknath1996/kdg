@@ -180,7 +180,6 @@ class kdcnn(KernelDensityGraph):
         y : ndarray
             Output (i.e. response) data matrix.
         """
-        X, y = check_X_y(X, y)
         self.labels = np.unique(y)
 
         # get convolutional encoder outputs
