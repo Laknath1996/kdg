@@ -157,14 +157,14 @@ os.mkdir(folder)
 benchmark_suite = openml.study.get_suite('OpenML-CC18')
 current_dir = getcwd()
 files = listdir(current_dir+'/'+folder)
-Parallel(n_jobs=10,verbose=1)(
-        delayed(experiment)(
-                task_id,
-                folder
-                ) for task_id in benchmark_suite.tasks
-            )
+# Parallel(n_jobs=10,verbose=1)(
+#         delayed(experiment)(
+#                 task_id,
+#                 folder
+#                 ) for task_id in benchmark_suite.tasks
+#             )
 
-'''for task_id in benchmark_suite.tasks:
+for task_id in benchmark_suite.tasks:
     filename = 'openML_cc18_' + str(task_id) + '.csv'
     if filename not in files:
         print(filename)
@@ -173,5 +173,5 @@ Parallel(n_jobs=10,verbose=1)(
         except:
             print("couldn't run!")
         else:
-            print("Ran successfully!")'''
+            print("Ran successfully!")
 # %%
