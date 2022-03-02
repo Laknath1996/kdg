@@ -12,11 +12,10 @@ import os
 from os import listdir, getcwd 
 # %%
 
-# network architecture [10, 10, 10, 10, 2]
-def getNN(compile_kwargs, num_classes):
+def getNN(compile_kwargs, input_size, num_classes):
     network_base = keras.Sequential()
     initializer = keras.initializers.GlorotNormal(seed=0)
-    network_base.add(keras.layers.Dense(50, activation="relu", kernel_initializer=initializer, input_shape=(2,)))
+    network_base.add(keras.layers.Dense(50, activation="relu", kernel_initializer=initializer, input_shape=(input_size,)))
     network_base.add(keras.layers.Dense(50, activation="relu", kernel_initializer=initializer))
     network_base.add(keras.layers.Dense(50, activation="relu", kernel_initializer=initializer))
     network_base.add(keras.layers.Dense(50, activation="relu", kernel_initializer=initializer))
@@ -89,20 +88,18 @@ def experiment(task_id, folder, n_estimators=500, reps=30):
                 "optimizer": keras.optimizers.Adam(3e-4),
             }
             fit_kwargs = {
-                "epochs": 300,
+                "epochs": 200,
                 "batch_size": 64,
                 "verbose": False,
             }
             kdn_kwargs = {
                 "k": 1e-5,
-                "polytope_compute_method": "all",
-                "weighting_method": "lin",
                 "T": 1e-3,
                 "h": 1/2,
                 "verbose": False
             }
             # train Vanilla NN
-            nn = getNN(compile_kwargs, len(unique_classes))
+            nn = getNN(compile_kwargs, X.shape[-1], len(unique_classes))
             nn.fit(X, keras.utils.to_categorical(y), **fit_kwargs)
 
             model_kdn = kdn(nn, **kdn_kwargs)
@@ -168,10 +165,11 @@ for task_id in benchmark_suite.tasks:
     filename = 'openML_cc18_' + str(task_id) + '.csv'
     if filename not in files:
         print(filename)
-        try:
-            experiment(task_id,folder)
-        except:
-            print("couldn't run!")
-        else:
-            print("Ran successfully!")
+        experiment(task_id,folder)
+        # try:
+        #     experiment(task_id,folder)
+        # except:
+        #     print("couldn't run!")
+        # else:
+        #     print("Ran successfully!")
 # %%
